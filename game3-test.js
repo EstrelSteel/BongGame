@@ -97,6 +97,7 @@ function drawBalls() {
 function drawScore() {
     ctx.fillRect(0, HEIGHT, WIDTH, 1);
     ctx.fillRect(WIDTH, 0, 1, HEIGHT);
+    ctx.fillText("Score: ", 20, HEIGHT + 22);
     var flavour;
     for(var i = 0; i < scores.length; i++) {
         flavour = "null";
@@ -108,7 +109,7 @@ function drawScore() {
             flavour = paddles[i - balls.length].n;
             flavour = flavour + ": ";
         }
-        ctx.fillText(flavour + scores[i], 20, HEIGHT + (20 * (i + 1)));
+        ctx.fillText(flavour + scores[i], 40, HEIGHT + (22 * (i + 2)));
     }
 }
 
@@ -130,6 +131,7 @@ function clear() {
 function init() {
 	can = document.getElementById("canvas");
   	ctx = can.getContext("2d");
+    ctx.font="20px ComicSansMS";
     if(WIDTH === 0 || HEIGHT === 0) {
         WIDTH = can.width;
         HEIGHT = can.height;
