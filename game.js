@@ -1,93 +1,168 @@
+// Bong
+
+//===============================================
+//              ENGINE STUFF
+//        ( Deep engine functionality )
+//===============================================
+
+// How often should the game sample information?
+var TICK_RATE = 60.0;
+// if( window.device == devices.CONSOLE ) { TICK_RATE = 15.0 }
+
+// If you don't know what these two variables do,
+// this game was made for you.
 var WIDTH = 400;
 var HEIGHT = 400;
-var can;
-var ctx;
-var x = 200;
-var y = 200;
-var xVel = 5;
-var yVel = 5;
-var w = 20;
-var h = 20;
-var start = true;
-var xP = 20;
-var yP = 160;
-var wP = 20;
-var hP = 80;
-var score = 0;
+// Get the canvas from the page.
+var canvas = document.getElementById('bongZone');
+// Set the size of the canvas.
+canvas.width = WIDTH;
+canvas.height = HEIGHT;
+// Get the (d)rawing conte(x)t.
+var dx = canvas.getContext('2d');
 
-function doKeyDown(e) {
-	switch(e.keyCode) {
-	case 87: //W
-		yVel = yVel - 2;
-		break;
-	case 83: //S
-		yVel = yVel + 2;
-		break;
-	case 38: //UP ARROW
-		yP = yP - 10;
-		break;
-	case 40: //DOWN ARROW
-		yP = yP + 10;
-		break;
-	case 32: //SPACE
-		start = true;
-		break;
-	}
+// Request an update from the window. Run 'onTick()' when we DO get an update.
+var frameUpdate = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function (onTick) {
+	window.setTimeout(onTick, 1000.0 / TICK_RATE);
+};
+
+// This is where we will store our key states.
+// This is better than directly getting the
+// key state because it uses booleans which
+// makes the input BUTTERY SMOOTH!
+var keys = {};
+
+// If a key is down, add it to the keys object so we can
+// sample it in our input loop.
+window.addEventListener('keydown', function (event) {
+    keys[event.keyCode] = true;
+});
+
+// When the key is up, delete the keyCode from the keys object
+// to keep the input loop speedy for those console players.
+window.addEventListener('keyup', function (event) {
+	delete keys[event.keyCode];
+});
+
+// Time of our last tick.
+var lastTick = Date.now();
+
+// Calculate our delta, and pass it to our render and update functions.
+function tick() {
+	var now = Date.now();
+	var delta = (now - lastTick) * 0.01;
+	lastTick = now;
+	update(delta);
+	render(delta);
+	frameUpdate(tick);
+}
+// Start the loop.
+frameUpdate(tick);
+
+// Linear Interpolation
+function lerp(from, to, fac) 
+{
+    return ((from * (1.0 - fac)) + (to * fac));
 }
 
-function clear() {
-	ctx.clearRect(0, 0, WIDTH, HEIGHT);
+//===============================================
+//             GAME CONTENT STUFF
+//         ( Base objects for the game )
+//===============================================
+
+// Game Objects
+var gameObjects = [];
+
+// Ball object
+function Ball(x, y, size) {
+	// Position XY
+	this.x = x;
+	this.y = y;
+
+	// Color and Diameter.
+	this.size = size;
+	this.color = '#000';
+
+	// Velocity XY
+	this.velX = (Math.random() * 2 - 1) * 10;
+	this.velY = (Math.random() * 2 - 1) * 10;
+	// Air resistance (Should the velocity slow over time? By how much?)
+	this.resistance = 5;
+
+	// Five Seconds til DEATH.
+	this.lifetime = 5 * 1000;
 }
 
-function init() {
-	can = document.getElementById("canvas");
-  	ctx = can.getContext("2d");
-  	WIDTH = can.width;
-  	HEIGHT = can.height;
-  	return setInterval(draw, 30);
+// Update Ball Object
+Ball.prototype.update = function(delta) {
+
+	// When we multiply a varialbe (resistance, for example) by the delta
+	// It's basically that number of units per second.
+	// Make sesne?
+
+
+	this.x += this.velX * delta;
+	this.y += this.velY * delta;
+
+	// IS THIS WORKING!?!?!?!
+	lerp(this.velX, 0.0, this.resistance * delta);
+	lerp(this.velY, 0.0, this.resistance * delta);
+
+	this.lifetime -= delta;
+
+	if(this.lifetime <= 0)
+		gameObjects.splice(gameObjects.indexOf(this), 1);
+};
+
+// Render Ball Object
+Ball.prototype.render = function(delta) {
+	dx.fillStyle = this.color;
+	dx.beginPath();
+    dx.arc(this.x, this.y, this.size / 2, 0, 2 * Math.PI, false);
+    dx.fill();
+    dx.lineWidth = 1;
+    dx.strokeStyle = '#FF0000';
+    dx.stroke();
+};
+
+//===============================================
+//              GAME STUFF
+// ( Actual game logic and adding of objects )
+//===============================================
+
+
+function update(delta) {
+	for (var key in keys) {
+        key = Number(key);
+        if (key == 37) {
+        	// LEFT ARROW
+        	gameObjects.push(new Ball(200, 200, 10));
+        }
+    }
+    
+    // Update all game objects.
+    gameObjects.forEach(function(gameObject){
+    	gameObject.update(delta);
+    });
 }
 
-function draw() {
-	clear();
-	ctx.fillRect(x, y, w, h);
-	ctx.fillRect(xP, yP, wP, hP);
-	ctx.fillRect(WIDTH - (xP + wP), yP, wP, hP);
-	if(start) {
-		ctx.fillText("SCORE: " + score, 20, 20);
-		x = x + xVel;
-		y = y + yVel;
-		
-		if(y < 0 || y > HEIGHT) {
-			yVel = yVel * -1;
-		}
-		if((x + w > xP && x < xP + wP) && (y + h > yP && y < yP + hP)) {
-			yVel = 5;
-			xVel = xVel * -1;
-			score = score + 1;
-		}
-		//		 40	   > 400 - (20 + 20)
-		else if((x + w > WIDTH - (xP + wP) && x < WIDTH - wP) && (y + h > yP && y < yP + hP)) {
-			yVel = -5;
-			xVel = xVel * -1;
-			score = score + 1;
-		}
-		
-		if(x < -20 || x > WIDTH + 20) {
-			start = true;
-			x = 200;
-			y = 200;
-			xVel = 5;
-			yVel = 5;
-			yP = 160;
-			score = 0;
-		}
-		
-	}
-	else {
-		ctx.fillText("BONG 3.0a", 20, 20);
-	}
+function render(delta) {
+	// Clear the canvas.
+	dx.clearRect(0, 0, WIDTH, HEIGHT);
+    // Draw delta time.
+    dx.fillStyle = '#000000';
+	dx.font = '25px Arial';
+	dx.fillText('Delta: ' + (delta * 100) + 'ms', 10, 50);
+
+	// Render all game objects.
+	gameObjects.forEach(function(gameObject){
+    	gameObject.render(delta);
+    });
 }
 
-init();
-draw();
-window.addEventListener('keydown', doKeyDown, true);
+
+// TODO:
+//- Make "master" game object with Update, Render, and auto-remove logic.
+//- Figure out the whole velocity thing with the ball
+//- Better input sampling (the key array is good, I'm talking about the loop part in update() )
+//- Add DLC. Lots and lots of DLC.
