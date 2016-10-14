@@ -1,3 +1,11 @@
+/*
+
+NOT IN USE FOR BONG 3
+IF YOU WOULD LIKE TO WORK ON BONG 3 TRY game3-test.js and index3.html
+
+*/
+
+
 var WIDTH = 400;
 var HEIGHT = 400;
 var can;
