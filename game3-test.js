@@ -1,27 +1,44 @@
+//The playable area width and height
+//  If set to zero then it will match the whole canvas
 var WIDTH = 400;
 var HEIGHT = 400;
+//Variable for the starting elements and stuff
+//  Used to define if the game is running and
+//  What key to start
 var start;
+//The canvas
 var can;
+//The drawing context
 var ctx;
+//Array the paddles in the game
 var paddles = [];
+//Array the balls in the game
 var balls = [];
+//Temp variables for loops and stuff
 var p, b;
+//What keys are/aren't being pressed
 var keys = [];
+//The background type
 var bgType = 0;
+//Scores for each ball/player
 var scores = [];
 
+//Fills the keys and scores array with data
 function populateArrs() {
+    //Sets all keys to not being pressed, so false
     for(var i = 0; i < 128; i++) {
         keys[i] = false;
     }
+    //Sets all scores to zero
     for(var j = 0; j < balls.length + paddles.length; j++) {
         scores[j] = 0;
     }
 }
 
+//This function renders the background based on the type
 function drawBackground() {
     switch(bgType) {
-    case 0:
+    case 0: //No background
         break;
     }
 }
@@ -81,9 +98,6 @@ function calcNewBallPosition(bi) {
 function drawBalls() {
     for(var i = 0; i < balls.length; i++) {
         b = balls[i];
-        if(start.start) {
-            b = calcNewBallPosition(i);
-        }
         switch(b.t) {
         case 0: //SQUARE
             ctx.fillRect(b.x, b.y, b.w, b.h);
@@ -179,6 +193,9 @@ function draw() {
 
 function tick() {
     if(start.start) {
+        for(var e = 0; e < balls.length; e++) {
+            calcNewBallPosition(e);
+        }
         for(var k = 0; k < keys.length; k++) {
             if(keys[k]) {
                 for(var i = 0; i < paddles.length; i++) {
