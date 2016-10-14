@@ -7,10 +7,18 @@ var paddles = [];
 var balls = [];
 var p, b;
 var keys = [];
+var bgType = 0;
 
 function populateKeys() {
     for(var i = 0; i < 128; i++) {
         keys[i] = false;
+    }
+}
+
+function drawBackground() {
+    switch(bgType) {
+    case 0:
+        break;
     }
 }
 
@@ -104,6 +112,7 @@ function init() {
 
 function draw() {
 	clear();
+    drawBackground();
     drawPaddles();
     drawBalls();
 }
