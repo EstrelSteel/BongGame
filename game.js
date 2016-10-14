@@ -16,23 +16,23 @@ var hP = 80;
 var score = 0;
 
 function doKeyDown(e) {
-switch(e.keyCode) {
-case 87: //W
-	yVel = yVel - 2;
-	break;
-case 83: //S
-	yVel = yVel + 2;
-	break;
-case 38: //UP ARROW
-	yP = yP - 10;
-	break;
-case 40: //DOWN ARROW
-	yP = yP + 10;
-	break;
-case 32: //SPACE
-	start = true;
-	break;
-}
+	switch(e.keyCode) {
+	case 87: //W
+		yVel = yVel - 2;
+		break;
+	case 83: //S
+		yVel = yVel + 2;
+		break;
+	case 38: //UP ARROW
+		yP = yP - 10;
+		break;
+	case 40: //DOWN ARROW
+		yP = yP + 10;
+		break;
+	case 32: //SPACE
+		start = true;
+		break;
+	}
 }
 
 function clear() {
